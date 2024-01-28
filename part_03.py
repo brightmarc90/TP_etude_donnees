@@ -38,26 +38,14 @@ centers = [
     (20, 'Python'), (21, 'Python'), (22, 'Python'), (23, 'Python'), (24, 'PHP'), 
     (25, 'NoSQL'), (26, 'NoSQL'), (27, 'Big data'), (28, 'NoSQL'), (29, 'Angular'), (29, 'PHP'), (29,'Big data')
 ]
-
-def usersByCenter():
-    collection = {}
-    for id, center in centers:
-        collection[center] = []
-    for id, center in centers: 
-        for person in populations:
-            if person["id"] == id:
-                collection[center].append(person["name"])             
-    return collection
-
-centerList = usersByCenter()
-print(centerList)
-
+# fonction retourant les centres d'intétéret d'une personne dont l'id est passé en paramètre
 def getCenter(personId , centers):
 
-    return [ center for i, center in centers if i == personId ]
+    return {populations[personId]["name"]:[ center for i, center in centers if i == personId ]}
 
 print(getCenter(0, centers))
 
+#fonction retournant la liste des personnes ayant le même centre d'intérêt
 def getUsers(center, pops, centers):
 
     return{center: [ person["name"] for person in pops for a, b in centers if person["id"] == a and b == center]}

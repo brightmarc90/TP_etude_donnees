@@ -23,16 +23,15 @@ relationships = [
 ]
 
 # question 1
-
 for person in populations:
-    person["relation"] = []
+    person['relation'] = []
 
-for person in populations:
-    for relation in relationships:
-        if person["id"] == relation[0] or person["id"] == relation[1]:
-            person["relation"].append(relation)
+for relation in relationships:
+    id1, id2 = relation
+    populations[id1]['relation'].append(relation)
+    populations[id2]['relation'].append(relation)
 
-print(populations)
+print("==== Ajout de la clé relation ====\n", populations)
 
 # question 2
 def average():
@@ -44,38 +43,24 @@ def average():
 print("===== moyenne ====== \n", average())
 
 #question 3
-idList = []
-current = populations[0]
-for person in populations:
-    idList.append({"id" : person["id"], "nb_relations" : len(person["relation"])})
-    if len(person["relation"]) > len(current["relation"]):
-        current = person
+idList = [{"id": person["id"], "nb_relations" : len(person["relation"])} for person in populations]
+maxPerson = max(idList, key=lambda x: x['nb_relations'])
 print("===== list de id et nombre de relations ====== \n", idList)
-print("===== utilisteur qui a le plus de relations ====== \n",current["name"])
+print("===== utilisteur qui a le plus de relations ====== \n", maxPerson, populations[maxPerson['id']]['name'])
 
+#question 4
+for person in populations:
+    person["fof"] = []
+for person in populations:
+    for id1, id2 in person["relation"]:
+        # Ajouter les amis des amis dans une liste
+        person["fof"].extend(fof for fof in populations[id1]["relation"] if person["id"] not in fof)
+        person["fof"].extend(fof for fof in populations[id2]["relation"] if person["id"] not in fof)
+
+# Afficher les amis des amis de chaque utilisateur
 def friendsOfFriends():
     for person in populations:
-        listOfFriends = {}
-        for i in range(len(person["relation"])):
-            if person["relation"][i][0] != person["id"]:
-                id = person["relation"][i][0]
-                for j in range(len(populations[id]["relation"])):
-                    if populations[id]["relation"][j][0] != id and populations[id]["relation"][j][0] != person["id"]:
-                        friendId = populations[id]["relation"][j][0]
-                        listOfFriends[friendId] = populations[friendId]["name"]
-                    else:
-                        friendId = populations[id]["relation"][j][1]
-                        listOfFriends[friendId] = populations[friendId]["name"]
-            else:
-                id = person["relation"][i][1]
-                for j in range(len(populations[id]["relation"])):
-                    if populations[id]["relation"][j][0] != id and populations[id]["relation"][j][0] != person["id"]:
-                        friendId = populations[id]["relation"][j][0]
-                        listOfFriends[friendId] = populations[friendId]["name"]
-                    else:
-                        friendId = populations[id]["relation"][j][1]
-                        listOfFriends[friendId] = populations[friendId]["name"]
-        yield listOfFriends
-
+        yield {"person": person["name"], "fof": list(set([(id, populations[id]["name"]) for relation in person["fof"] for id in relation]))}
 friends = friendsOfFriends()
+print("==== Amis d'amis ====")
 print(next(friends))
